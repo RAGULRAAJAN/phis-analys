@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let susCount = stats.suspicious !== undefined ? stats.suspicious : 0;
                 let harmCount = stats.harmless !== undefined ? stats.harmless : 0;
                 
-                if (statusMsg.includes("Missing VT API Key") || statusMsg.includes("Skipped")) {
+                if (statusMsg.includes("Missing VT API Key") || statusMsg.includes("Skipped") || statusMsg.includes("Not found")) {
                     malCount = '-';
                     susCount = '-';
                     harmCount = '-';
