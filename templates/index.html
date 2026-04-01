@@ -3,98 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phishing Email Analyser</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>CyberSentinel AI Phishing Analyser</title>
+    <!-- Modern Tech Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="overlay"></div>
-    <div class="container">
-        
-        <header>
-            <div class="logo-icon"></div>
-            <h1>Phishing <span class="highlight">Analyser</span></h1>
-            <p>Upload a raw `.eml` file to automatically extract headers, pull URLs, and perform deep threat analysis via VirusTotal.</p>
-        </header>
-
-        <form id="upload-form">
-            <div class="glass-panel drop-zone" id="drop-zone">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                <h3>Drag & Drop your .eml file here</h3>
-                <p>or click to browse</p>
-                <input type="file" id="file-input" accept=".eml" hidden>
+    <div class="cyber-grid-overlay"></div>
+    
+    <div class="app-layout">
+        <!-- Sidebar Navigation & Controls -->
+        <aside class="sidebar glass-panel">
+            <div class="brand">
+                <div class="brand-glow"></div>
+                <h1>Cyber<span class="neon-text">Sentinel</span><span class="ai-badge">AI</span></h1>
+                <p>Advanced Phishing Threat Detection</p>
             </div>
-        </form>
 
-        <div id="history-container" class="glass-panel mt-4 hidden">
-            <h3 style="color: var(--accent-cyan); margin-bottom: 1rem;">Recent Scans</h3>
-            <div class="table-container">
-                <table id="history-table">
-                    <thead>
-                        <tr><th>Time</th><th>File</th><th>Score</th><th>Risk Level</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="loading" class="hidden">
-            <div class="spinner"></div>
-            <p>Analyzing email... Please wait while URLs are scanned.</p>
-        </div>
-
-        <div id="results" class="hidden glass-panel">
-            <div class="dashboard">
-                <div class="score-card">
-                    <h3 id="risk-level-badge">Risk Level</h3>
-                    <div class="progress-ring">
-                        <svg class="circular-chart" viewBox="0 0 36 36">
-                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path id="score-circle" class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        </svg>
-                        <div class="score-text"><span id="score-value">0</span>/10</div>
+            <div class="upload-section">
+                <form id="upload-form">
+                    <div class="cyber-drop-zone" id="drop-zone">
+                        <div class="drop-icon-ring">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </div>
+                        <h3>Upload Target (.eml)</h3>
+                        <p>Drop file or click to select</p>
+                        <input type="file" id="file-input" accept=".eml" hidden>
                     </div>
-                </div>
-
-                <div class="headers-card">
-                    <h3>Extracted Headers</h3>
-                    <ul id="headers-list"></ul>
+                </form>
+                
+                <div id="loading" class="hidden">
+                    <div class="radar-spinner">
+                        <div class="radar-line"></div>
+                    </div>
+                    <p class="crypto-text">INITIALIZING DEEP SCAN...</p>
+                    <p class="sub-loading">Querying Global Threat Intelligence Database</p>
                 </div>
             </div>
 
-            <div class="body-card">
-                <style>
-                    .body-card h3 { color: var(--accent-cyan); font-size: 1.1rem; margin-bottom: 1rem; }
-                    .body-preview-box { background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 1rem; border-radius: 8px; max-height: 250px; overflow-y: auto; white-space: pre-wrap; font-size: 0.85rem; color: var(--text-muted); font-family: monospace; }
-                </style>
-                <h3>Email Body Preview</h3>
-                <pre id="body-preview" class="body-preview-box"></pre>
-            </div>
-
-            <div class="urls-card mt-4">
-                <h3>VirusTotal URL Scan Results (<span id="url-count">0</span> found)</h3>
-                <div class="table-container">
-                    <table id="urls-table">
+            <div id="history-container" class="history-section hidden mt-4">
+                <h3 class="section-title">Scan History</h3>
+                <div class="history-list-wrapper">
+                    <table id="history-table" class="cyber-table small-table">
                         <thead>
-                            <tr>
-                                <th>URL</th>
-                                <th>Malicious</th>
-                                <th>Suspicious</th>
-                                <th>Harmless</th>
-                                <th>Status</th>
-                            </tr>
+                            <tr><th>Time</th><th>Target</th><th>Risk</th></tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
             </div>
             
-            <button class="btn-reset" id="reset-btn">Analyze Another Email</button>
-        </div>
+            <button class="cyber-btn hidden" id="reset-btn">
+                <span>[ INIT NEW SCAN ]</span>
+            </button>
+        </aside>
+
+        <!-- Main Dashboard -->
+        <main class="main-content">
+            <div id="results" class="hidden">
+                <div class="header-status">
+                    <h2>Threat Analytics Dashboard</h2>
+                    <div class="status-indicator">
+                        <span class="pulse-dot"></span> SECURE CONNECTION
+                    </div>
+                </div>
+
+                <div class="bento-grid">
+                    <!-- Score Card -->
+                    <div class="bento-card score-card glow-border">
+                        <h3 class="section-title">AI Threat Verdict</h3>
+                        <div class="score-display">
+                            <h2 id="risk-level-badge" class="risk-text">ANALYZING</h2>
+                            <div class="progress-ring-container">
+                                <svg class="circular-chart" viewBox="0 0 36 36">
+                                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path id="score-circle" class="circle neon-path" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                </svg>
+                                <div class="score-text"><span id="score-value">0</span><span class="max-score">/10</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Extracted Headers Card -->
+                    <div class="bento-card headers-card code-font">
+                        <h3 class="section-title">Extracted Metadata</h3>
+                        <ul id="headers-list" class="tech-list"></ul>
+                    </div>
+
+                    <!-- VirusTotal Scans Card -->
+                    <div class="bento-card urls-card full-span content-scroll">
+                        <h3 class="section-title">VirusTotal Global Escalate (<span id="url-count" class="accent-text">0</span> IOCs)</h3>
+                        <table id="urls-table" class="cyber-table">
+                            <thead>
+                                <tr>
+                                    <th>Extracted URL</th>
+                                    <th>Malicious</th>
+                                    <th>Suspicious</th>
+                                    <th>Harmless</th>
+                                    <th>VT Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Body Preview Card -->
+                    <div class="bento-card body-card full-span code-font">
+                        <h3 class="section-title">Decrypted Payload (Body Preview)</h3>
+                        <pre id="body-preview" class="body-preview-box"></pre>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
     
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>

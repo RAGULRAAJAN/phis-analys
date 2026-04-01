@@ -19,10 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const tr = document.createElement('tr');
                     const d = new Date(scan.timestamp);
                     tr.innerHTML = `
-                        <td>${d.toLocaleDateString()} ${d.toLocaleTimeString()}</td>
-                        <td>${escapeHtml(scan.filename)}</td>
-                        <td><strong>${scan.score}/10</strong></td>
-                        <td><span style="font-size: 0.8rem; padding: 2px 8px; border-radius: 12px;" class="badge-${scan.risk_level.toLowerCase()}">${scan.risk_level}</span></td>
+                        <td style="font-size:0.75rem;">${d.toLocaleDateString()} ${d.toLocaleTimeString()}</td>
+                        <td style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(scan.filename)}</td>
+                        <td><span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; border: 1px solid; background: rgba(0,0,0,0.5);" class="badge-${scan.risk_level.toLowerCase()}">${scan.risk_level} (${scan.score})</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -87,8 +86,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.classList.remove('hidden');
             } else {
                 form.classList.add('hidden');
+                loading.classList.add('hidden'); // Fix loading state hiding
                 historyContainer.classList.add('hidden');
                 renderResults(data);
+                resetBtn.classList.remove('hidden');
             }
         })
         .catch(error => {
@@ -111,8 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Render Risk Badge
         const badge = document.getElementById('risk-level-badge');
-        badge.innerText = `Risk: ${risk.risk_level}`;
-        badge.className = `badge-${risk.risk_level.toLowerCase()}`;
+        badge.innerText = `LEVEL: ${risk.risk_level.toUpperCase()}`;
+        badge.className = `risk-text badge-${risk.risk_level.toLowerCase()}`;
         
         // Color the circle based on risk
         circle.style.stroke = `var(--${risk.risk_level.toLowerCase()})`;
@@ -173,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resetBtn.addEventListener('click', () => {
         results.classList.add('hidden');
+        resetBtn.classList.add('hidden');
         form.classList.remove('hidden');
         fileInput.value = '';
         loadHistory(); // reload history to show the newly scanned item!
