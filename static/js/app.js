@@ -5,6 +5,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const loading = document.getElementById('loading');
     const results = document.getElementById('results');
     const resetBtn = document.getElementById('reset-btn');
+    const historyContainer = document.getElementById('history-container');
+
+    function loadHistory() {
+        fetch('/history')
+        .then(r => r.json())
+        .then(history => {
+            if (history.length) {
+                historyContainer.classList.remove('hidden');
+                const tbody = document.querySelector('#history-table tbody');
+                tbody.innerHTML = '';
+                history.forEach(scan => {
+                    const tr = document.createElement('tr');
+                    const d = new Date(scan.timestamp);
+                    tr.innerHTML = `
+                        <td>${d.toLocaleDateString()} ${d.toLocaleTimeString()}</td>
+                        <td>${escapeHtml(scan.filename)}</td>
+                        <td><strong>${scan.score}/10</strong></td>
+                        <td><span style="font-size: 0.8rem; padding: 2px 8px; border-radius: 12px;" class="badge-${scan.risk_level.toLowerCase()}">${scan.risk_level}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }).catch(err => console.log(err));
+    }
+    loadHistory(); // load on page load
 
     // Drag and drop event listeners
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -61,6 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Error: ' + data.error);
                 form.classList.remove('hidden');
             } else {
+                form.classList.add('hidden');
+                historyContainer.classList.add('hidden');
                 renderResults(data);
             }
         })
@@ -93,14 +120,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Render Headers
         const headersList = document.getElementById('headers-list');
         headersList.innerHTML = '';
-        const importantHeaders = ['From', 'To', 'Subject', 'Date', 'Message-ID'];
+        const importantHeaders = ['From', 'To', 'Subject', 'Date', 'Message-ID', 'Attachments'];
         importantHeaders.forEach(key => {
             if (data.headers[key]) {
                 const li = document.createElement('li');
-                li.innerHTML = `<strong>${key}:</strong> ${escapeHtml(data.headers[key])}`;
+                let val = Array.isArray(data.headers[key]) ? data.headers[key].join(', ') : data.headers[key];
+                li.innerHTML = `<strong>${key}:</strong> ${escapeHtml(val)}`;
                 headersList.appendChild(li);
             }
         });
+
+        // Render Body Preview
+        const bodyPreview = document.getElementById('body-preview');
+        if (bodyPreview) {
+            bodyPreview.textContent = data.body || 'No body content parsed.';
+        }
 
         // Render URLs Table
         document.getElementById('url-count').innerText = data.urls_found;
@@ -117,13 +151,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 let susClass = stats.suspicious > 0 ? 'text-warning' : '';
                 let statusMsg = stats.status || (stats.error ? `<span class="text-danger">${stats.error}</span>` : 'Scanned');
                 
+                let malCount = stats.malicious !== undefined ? stats.malicious : '-';
+                let susCount = stats.suspicious !== undefined ? stats.suspicious : '-';
+                let harmCount = stats.harmless !== undefined ? stats.harmless : '-';
+                
                 tr.innerHTML = `
                     <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(url)}">
                         <a href="${escapeHtml(url)}" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">${escapeHtml(url)}</a>
                     </td>
-                    <td class="${malClass}">${stats.malicious || 0}</td>
-                    <td class="${susClass}">${stats.suspicious || 0}</td>
-                    <td>${stats.harmless || 0}</td>
+                    <td class="${malClass}">${malCount}</td>
+                    <td class="${susClass}">${susCount}</td>
+                    <td>${harmCount}</td>
                     <td>${statusMsg}</td>
                 `;
                 tbody.appendChild(tr);
@@ -137,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         results.classList.add('hidden');
         form.classList.remove('hidden');
         fileInput.value = '';
+        loadHistory(); // reload history to show the newly scanned item!
     });
 
     // Helper to prevent XSS in rendering

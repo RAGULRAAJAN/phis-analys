@@ -8,7 +8,7 @@ def scan_urls(urls, api_key):
     Enforces a strict 4 requests/min limit for free tiers by waiting 15s between requests.
     """
     if not api_key:
-        return {"error": "No VirusTotal API key provided", "results": {}}
+        return {url: {"error": "Missing VT API Key"} for url in urls}
         
     results = {}
     headers = {
@@ -26,7 +26,7 @@ def scan_urls(urls, api_key):
         vt_endpoint = f"https://www.virustotal.com/api/v3/urls/{url_id}"
         
         try:
-            response = requests.get(vt_endpoint, headers=headers)
+            response = requests.get(vt_endpoint, headers=headers, timeout=10)
             if response.status_code == 200:
                 data = response.json()
                 stats = data.get("data", {}).get("attributes", {}).get("last_analysis_stats", {})

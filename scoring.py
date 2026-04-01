@@ -12,27 +12,52 @@ def calculate_risk_score(parsed_data, vt_results):
     if not date_header or date_header == 'Not Found':
         score += 1
         
-    # 2. Bulk/Mass Mail sender anomalies
+    # 2. Advanced Header Anomalies
     from_header = headers.get('From', '')
-    if "<" not in from_header and "@" in from_header:
-        # Simplistic check for properly formatted From headers
-        score += 1
+    message_id = headers.get('Message-ID', '')
+    
+    # Domain mismatch check
+    from_domain = from_header.split('@')[-1].strip('<> \n').lower() if '@' in from_header else ''
+    msg_domain = message_id.split('@')[-1].strip('<> \n').lower() if '@' in message_id else ''
+    
+    if from_domain and msg_domain and from_domain not in msg_domain and msg_domain not in from_domain:
+        score += 3 # Strong phishing indicator
+        
+    # SPF/DKIM/DMARC checks
+    auth_results = headers.get('Authentication-Results', '')
+    if auth_results and auth_results != 'Not Found':
+        auth_lower = auth_results.lower()
+        if 'spf=fail' in auth_lower or 'spf=softfail' in auth_lower:
+            score += 2
+        if 'dkim=fail' in auth_lower:
+            score += 2
+        if 'dmarc=fail' in auth_lower:
+            score += 2
 
     # 3. VirusTotal Signals
     malicious_urls_found = 0
     suspicious_urls_found = 0
     
-    if isinstance(vt_results, dict) and "error" not in vt_results:
+    if isinstance(vt_results, dict):
         for url, stats in vt_results.items():
-            if "malicious" in stats and stats["malicious"] > 0:
+            if "error" in stats:
+                continue
+            if "malicious" in stats and stats.get("malicious", 0) > 0:
                 malicious_urls_found += 1
-            elif "suspicious" in stats and stats["suspicious"] > 0:
+            elif "suspicious" in stats and stats.get("suspicious", 0) > 0:
                 suspicious_urls_found += 1
                 
     if malicious_urls_found > 0:
         score += 8  # Immediate high risk
     elif suspicious_urls_found > 0:
         score += 4
+        
+    # 4. Attachment Analysis
+    attachments = headers.get('Attachments', [])
+    dangerous_extensions = ['.exe', '.js', '.vbs', '.bat', '.cmd', '.scr', '.ps1', '.docm', '.xlsm']
+    for att in attachments:
+        if any(att.lower().endswith(ext) for ext in dangerous_extensions):
+            score += 5 # Highly suspicious attachment
         
     # Cap score at 10
     final_score = min(score, max_score)
