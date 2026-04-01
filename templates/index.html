@@ -11,111 +11,98 @@
 <body>
     <div class="cyber-grid-overlay"></div>
     
-    <div class="app-layout">
-        <!-- Sidebar Navigation & Controls -->
-        <aside class="sidebar glass-panel">
+    <div class="container">
+        <!-- Centered Header -->
+        <header class="top-nav glass-panel">
             <div class="brand">
                 <div class="brand-glow"></div>
                 <h1>Cyber<span class="neon-text">Sentinel</span><span class="ai-badge">AI</span></h1>
                 <p>Advanced Phishing Threat Detection</p>
             </div>
+        </header>
 
-            <div class="upload-section">
-                <form id="upload-form">
-                    <div class="cyber-drop-zone" id="drop-zone">
-                        <div class="drop-icon-ring">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                            </svg>
-                        </div>
-                        <h3>Upload Target (.eml)</h3>
-                        <p>Drop file or click to select</p>
-                        <input type="file" id="file-input" accept=".eml" hidden>
+        <!-- Initial Upload View -->
+        <main id="upload-view" class="view-panel center-glass glass-panel glow-border">
+            <form id="upload-form">
+                <div class="cyber-drop-zone" id="drop-zone">
+                    <div class="drop-icon-ring">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
                     </div>
-                </form>
-                
-                <div id="loading" class="hidden">
-                    <div class="radar-spinner">
-                        <div class="radar-line"></div>
-                    </div>
-                    <p class="crypto-text">INITIALIZING DEEP SCAN...</p>
-                    <p class="sub-loading">Querying Global Threat Intelligence Database</p>
+                    <h3>Upload Target (.eml)</h3>
+                    <p>Drop file or click to select</p>
+                    <input type="file" id="file-input" accept=".eml" hidden>
+                </div>
+            </form>
+            
+            <div id="loading" class="hidden">
+                <div class="radar-spinner">
+                    <div class="radar-line"></div>
+                </div>
+                <p class="crypto-text">INITIALIZING DEEP SCAN...</p>
+                <p class="sub-loading">Querying Global Threat Intelligence Database</p>
+            </div>
+        </main>
+
+        <!-- Results Dashboard -->
+        <main id="results" class="hidden">
+            <div class="header-status">
+                <h2>Threat Analytics Dashboard</h2>
+                <div class="status-indicator">
+                    <span class="pulse-dot"></span> SECURE CONNECTION
                 </div>
             </div>
 
-            <div id="history-container" class="history-section hidden mt-4">
-                <h3 class="section-title">Scan History</h3>
-                <div class="history-list-wrapper">
-                    <table id="history-table" class="cyber-table small-table">
+            <div class="bento-grid">
+                <!-- Score Card -->
+                <div class="bento-card score-card glow-border">
+                    <h3 class="section-title">AI Threat Verdict</h3>
+                    <div class="score-display">
+                        <h2 id="risk-level-badge" class="risk-text">ANALYZING</h2>
+                        <div class="progress-ring-container">
+                            <svg class="circular-chart" viewBox="0 0 36 36">
+                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="score-circle" class="circle neon-path" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <div class="score-text"><span id="score-value">0</span><span class="max-score">/100</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extracted Headers Card -->
+                <div class="bento-card headers-card code-font">
+                    <h3 class="section-title">Extracted Metadata</h3>
+                    <ul id="headers-list" class="tech-list"></ul>
+                </div>
+
+                <!-- VirusTotal Scans Card -->
+                <div class="bento-card urls-card full-span content-scroll">
+                    <h3 class="section-title">VirusTotal Global Escalate (<span id="url-count" class="accent-text">0</span> IOCs)</h3>
+                    <table id="urls-table" class="cyber-table">
                         <thead>
-                            <tr><th>Time</th><th>Target</th><th>Risk</th></tr>
+                            <tr>
+                                <th>Extracted URL</th>
+                                <th>Malicious</th>
+                                <th>Suspicious</th>
+                                <th>Harmless</th>
+                                <th>VT Status</th>
+                            </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
+
+                <!-- Body Preview Card -->
+                <div class="bento-card body-card full-span code-font">
+                    <h3 class="section-title">Decrypted Payload (Body Preview)</h3>
+                    <pre id="body-preview" class="body-preview-box"></pre>
+                </div>
             </div>
             
-            <button class="cyber-btn hidden" id="reset-btn">
+            <button class="cyber-btn mt-4 hidden" id="reset-btn" style="margin-top: 2rem;">
                 <span>[ INIT NEW SCAN ]</span>
             </button>
-        </aside>
-
-        <!-- Main Dashboard -->
-        <main class="main-content">
-            <div id="results" class="hidden">
-                <div class="header-status">
-                    <h2>Threat Analytics Dashboard</h2>
-                    <div class="status-indicator">
-                        <span class="pulse-dot"></span> SECURE CONNECTION
-                    </div>
-                </div>
-
-                <div class="bento-grid">
-                    <!-- Score Card -->
-                    <div class="bento-card score-card glow-border">
-                        <h3 class="section-title">AI Threat Verdict</h3>
-                        <div class="score-display">
-                            <h2 id="risk-level-badge" class="risk-text">ANALYZING</h2>
-                            <div class="progress-ring-container">
-                                <svg class="circular-chart" viewBox="0 0 36 36">
-                                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                    <path id="score-circle" class="circle neon-path" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                </svg>
-                                <div class="score-text"><span id="score-value">0</span><span class="max-score">/100</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Extracted Headers Card -->
-                    <div class="bento-card headers-card code-font">
-                        <h3 class="section-title">Extracted Metadata</h3>
-                        <ul id="headers-list" class="tech-list"></ul>
-                    </div>
-
-                    <!-- VirusTotal Scans Card -->
-                    <div class="bento-card urls-card full-span content-scroll">
-                        <h3 class="section-title">VirusTotal Global Escalate (<span id="url-count" class="accent-text">0</span> IOCs)</h3>
-                        <table id="urls-table" class="cyber-table">
-                            <thead>
-                                <tr>
-                                    <th>Extracted URL</th>
-                                    <th>Malicious</th>
-                                    <th>Suspicious</th>
-                                    <th>Harmless</th>
-                                    <th>VT Status</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-
-                    <!-- Body Preview Card -->
-                    <div class="bento-card body-card full-span code-font">
-                        <h3 class="section-title">Decrypted Payload (Body Preview)</h3>
-                        <pre id="body-preview" class="body-preview-box"></pre>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
     

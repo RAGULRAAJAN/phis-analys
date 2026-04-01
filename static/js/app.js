@@ -5,31 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loading = document.getElementById('loading');
     const results = document.getElementById('results');
     const resetBtn = document.getElementById('reset-btn');
-    const historyContainer = document.getElementById('history-container');
-
-    function loadHistory() {
-        fetch('/history')
-        .then(r => r.json())
-        .then(history => {
-            if (history.length) {
-                historyContainer.classList.remove('hidden');
-                const tbody = document.querySelector('#history-table tbody');
-                tbody.innerHTML = '';
-                history.forEach(scan => {
-                    const tr = document.createElement('tr');
-                    const d = new Date(scan.timestamp);
-                    tr.innerHTML = `
-                        <td style="font-size:0.75rem;">${d.toLocaleDateString()} ${d.toLocaleTimeString()}</td>
-                        <td style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(scan.filename)}</td>
-                        <td><strong>${scan.score}/100</strong></td>
-                        <td><span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; border: 1px solid; background: rgba(0,0,0,0.5);" class="badge-${scan.risk_level.toLowerCase()}">${scan.risk_level}</span></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-        }).catch(err => console.log(err));
-    }
-    loadHistory(); // load on page load
+    const uploadView = document.getElementById('upload-view');
 
     // Drag and drop event listeners
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -81,14 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(data => {
-            loading.classList.add('hidden');
             if (data.error) {
+                loading.classList.add('hidden');
                 alert('Error: ' + data.error);
                 form.classList.remove('hidden');
             } else {
-                form.classList.add('hidden');
-                loading.classList.add('hidden'); // Fix loading state hiding
-                // history remains visible in the sidebar!
+                uploadView.classList.add('hidden'); // Hide entire upload panel
                 renderResults(data);
                 resetBtn.classList.remove('hidden');
             }
@@ -190,9 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
     resetBtn.addEventListener('click', () => {
         results.classList.add('hidden');
         resetBtn.classList.add('hidden');
+        uploadView.classList.remove('hidden');
         form.classList.remove('hidden');
+        loading.classList.add('hidden');
         fileInput.value = '';
-        loadHistory(); // reload history to show the newly scanned item!
     });
 
     // Helper to prevent XSS in rendering
