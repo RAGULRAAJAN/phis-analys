@@ -3,7 +3,7 @@ import sqlite3
 import json
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify
-from analyzer import parse_eml
+from analyser import parse_eml
 from virustotal import scan_urls
 from scoring import calculate_risk_score
 

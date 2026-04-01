@@ -21,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     tr.innerHTML = `
                         <td style="font-size:0.75rem;">${d.toLocaleDateString()} ${d.toLocaleTimeString()}</td>
                         <td style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(scan.filename)}</td>
-                        <td><span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; border: 1px solid; background: rgba(0,0,0,0.5);" class="badge-${scan.risk_level.toLowerCase()}">${scan.risk_level} (${scan.score})</span></td>
+                        <td><strong>${scan.score}/100</strong></td>
+                        <td><span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; border: 1px solid; background: rgba(0,0,0,0.5);" class="badge-${scan.risk_level.toLowerCase()}">${scan.risk_level}</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -118,15 +119,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // Color the circle based on risk
         circle.style.stroke = `var(--${risk.risk_level.toLowerCase()})`;
 
-        // Render Headers
+        // Render Headers and Findings
         const headersList = document.getElementById('headers-list');
         headersList.innerHTML = '';
-        const importantHeaders = ['From', 'To', 'Subject', 'Date', 'Message-ID', 'Attachments'];
+        
+        if (risk.findings && risk.findings.length > 0) {
+            risk.findings.forEach(finding => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>Finding:</strong> ${escapeHtml(finding)}`;
+                headersList.appendChild(li);
+            });
+        }
+        const importantHeaders = ['From', 'To', 'Subject', 'Date', 'Message-ID', 'Return-Path', 'Attachments'];
         importantHeaders.forEach(key => {
             if (data.headers[key]) {
                 const li = document.createElement('li');
                 let val = Array.isArray(data.headers[key]) ? data.headers[key].join(', ') : data.headers[key];
-                li.innerHTML = `<strong>${key}:</strong> ${escapeHtml(val)}`;
+                li.innerHTML = `<strong style="color:var(--accent-primary);">${key}:</strong> ${escapeHtml(val)}`;
                 headersList.appendChild(li);
             }
         });
@@ -152,9 +161,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 let susClass = stats.suspicious > 0 ? 'text-warning' : '';
                 let statusMsg = stats.status || (stats.error ? `<span class="text-danger">${stats.error}</span>` : 'Scanned');
                 
-                let malCount = stats.malicious !== undefined ? stats.malicious : '-';
-                let susCount = stats.suspicious !== undefined ? stats.suspicious : '-';
-                let harmCount = stats.harmless !== undefined ? stats.harmless : '-';
+                let malCount = stats.malicious !== undefined ? stats.malicious : 0;
+                let susCount = stats.suspicious !== undefined ? stats.suspicious : 0;
+                let harmCount = stats.harmless !== undefined ? stats.harmless : 0;
+                
+                if (statusMsg.includes("Missing VT API Key") || statusMsg.includes("Skipped")) {
+                    malCount = '-';
+                    susCount = '-';
+                    harmCount = '-';
+                }
                 
                 tr.innerHTML = `
                     <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(url)}">
