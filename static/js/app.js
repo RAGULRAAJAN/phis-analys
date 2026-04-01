@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 form.classList.add('hidden');
                 loading.classList.add('hidden'); // Fix loading state hiding
-                historyContainer.classList.add('hidden');
+                // history remains visible in the sidebar!
                 renderResults(data);
                 resetBtn.classList.remove('hidden');
             }
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 tr.innerHTML = `
                     <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(url)}">
-                        <a href="${escapeHtml(url)}" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">${escapeHtml(url)}</a>
+                        <a href="${escapeHtml(url)}" target="_blank" style="color: var(--accent-primary); text-decoration: none;">${escapeHtml(url)}</a>
                     </td>
                     <td class="${malClass}">${malCount}</td>
                     <td class="${susClass}">${susCount}</td>
