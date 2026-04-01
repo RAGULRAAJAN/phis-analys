@@ -277,7 +277,7 @@ body {
 }
 .neon-path { 
     fill: none;
-    filter: drop-shadow(0 0 2px currentcolor) drop-shadow(0 0 8px currentcolor) drop-shadow(0 0 16px currentcolor); 
+    filter: drop-shadow(0 0 6px currentcolor); 
     stroke-width: 4; 
     stroke-linecap: round; 
     transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease;
