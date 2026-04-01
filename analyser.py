@@ -79,13 +79,17 @@ if __name__ == "__main__":
     import argparse
     import json
     import io
+    import os
+    from dotenv import load_dotenv
     from virustotal import scan_urls
     from scoring import calculate_risk_score
     from datetime import datetime
     
+    load_dotenv()
+    
     parser = argparse.ArgumentParser(description="Phishing Email Analyser")
     parser.add_argument("--email", required=True, help="Path to the raw .eml file")
-    parser.add_argument("--apikey", default="dummy", help="VirusTotal API Key")
+    parser.add_argument("--apikey", default=os.environ.get("VT_API_KEY", "dummy"), help="VirusTotal API Key")
     parser.add_argument("--no-vt", action="store_true", help="Skip VirusTotal scanning")
     parser.add_argument("--json", action="store_true", help="Output report in JSON format")
     args = parser.parse_args()

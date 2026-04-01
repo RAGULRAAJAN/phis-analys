@@ -5,8 +5,10 @@ from flask import Flask, render_template, request, jsonify
 from analyser import parse_eml
 from virustotal import scan_urls
 from scoring import calculate_risk_score
+from dotenv import load_dotenv
 
 app = Flask(__name__)
+load_dotenv()
 
 # To test securely, set your API key as an environment variable before running
 VT_API_KEY = os.environ.get("VT_API_KEY", "") 
