@@ -4,19 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phishing Email Analyser</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <div class="overlay"></div>
     <div class="container">
-        <h1>Phishing Analyser</h1>
+        
+        <header>
+            <div class="logo-icon"></div>
+            <h1>Phishing <span class="highlight">Analyser</span></h1>
+            <p>Upload a raw `.eml` file to automatically extract headers, pull URLs, and perform deep threat analysis via VirusTotal.</p>
+        </header>
+
         <form id="upload-form">
-            <div class="drop-zone" id="drop-zone">
-                Drop your .eml file here or click to upload
+            <div class="glass-panel drop-zone" id="drop-zone">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <h3>Drag & Drop your .eml file here</h3>
+                <p>or click to browse</p>
                 <input type="file" id="file-input" accept=".eml" hidden>
             </div>
         </form>
-        <div id="results"></div>
+
+        <div id="loading" class="hidden">
+            <div class="spinner"></div>
+            <p>Analyzing email... Please wait while URLs are scanned.</p>
+        </div>
+
+        <div id="results" class="hidden glass-panel">
+            <div class="dashboard">
+                <div class="score-card">
+                    <h3 id="risk-level-badge">Risk Level</h3>
+                    <div class="progress-ring">
+                        <svg class="circular-chart" viewBox="0 0 36 36">
+                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path id="score-circle" class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <div class="score-text"><span id="score-value">0</span>/10</div>
+                    </div>
+                </div>
+
+                <div class="headers-card">
+                    <h3>Extracted Headers</h3>
+                    <ul id="headers-list"></ul>
+                </div>
+            </div>
+
+            <div class="urls-card mt-4">
+                <h3>VirusTotal URL Scan Results (<span id="url-count">0</span> found)</h3>
+                <div class="table-container">
+                    <table id="urls-table">
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th>Malicious</th>
+                                <th>Suspicious</th>
+                                <th>Harmless</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <button class="btn-reset" id="reset-btn">Analyze Another Email</button>
+        </div>
     </div>
+    
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
