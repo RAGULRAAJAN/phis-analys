@@ -70,10 +70,46 @@
                     </div>
                 </div>
 
+                <!-- AI Threat Explanation Card -->
+                <div class="bento-card full-span code-font" id="ai-card" style="display:none; border: 1px solid var(--accent-primary);">
+                    <h3 class="section-title">AI Threat Summary</h3>
+                    <div id="ai-explanation" class="box" style="font-size: 1.1em; line-height: 1.5; color: #c9d1d9; padding: 10px;"></div>
+                </div>
+
+                <!-- YARA Matches Card -->
+                <div class="bento-card urls-card full-span code-font" id="yara-card" style="display:none; border: 1px solid var(--high-risk);">
+                    <h3 class="section-title">Deep File Scanning (YARA)</h3>
+                    <ul id="yara-list" class="tech-list" style="margin-left: 10px;"></ul>
+                </div>
+
                 <!-- Extracted Headers Card -->
                 <div class="bento-card headers-card code-font">
                     <h3 class="section-title">Extracted Metadata</h3>
                     <ul id="headers-list" class="tech-list"></ul>
+                </div>
+
+                <!-- Spoofing / Homograph Card -->
+                <div class="bento-card urls-card full-span code-font" id="spoof-card" style="display:none;">
+                    <h3 class="section-title">Identity Spoofing & Homograph Detection</h3>
+                    <ul id="spoof-list" class="tech-list"></ul>
+                </div>
+
+                <!-- Social Engineering Card -->
+                <div class="bento-card urls-card full-span code-font" id="social-card" style="display:none;">
+                    <h3 class="section-title">Social Engineering Indicators</h3>
+                    <ul id="social-list" class="tech-list"></ul>
+                </div>
+
+                <!-- Relay Analysis Card -->
+                <div class="bento-card urls-card full-span code-font" id="relay-card" style="display:none;">
+                    <h3 class="section-title">Relay Chain Forensics</h3>
+                    <ul id="relay-list" class="tech-list"></ul>
+                </div>
+
+                <!-- Attachment Scan Card -->
+                <div class="bento-card urls-card full-span code-font" id="attach-card" style="display:none;">
+                    <h3 class="section-title">Attachment Content Deep Scan</h3>
+                    <ul id="attach-list" class="tech-list"></ul>
                 </div>
 
                 <!-- VirusTotal Scans Card -->
@@ -100,9 +136,14 @@
                 </div>
             </div>
             
-            <button class="cyber-btn mt-4 hidden" id="reset-btn" style="margin-top: 2rem;">
-                <span>[ INIT NEW SCAN ]</span>
-            </button>
+            <div class="action-buttons" style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
+                <button class="cyber-btn hidden" id="print-btn" onclick="window.print()">
+                    <span>[ EXPORT PDF REPORT ]</span>
+                </button>
+                <button class="cyber-btn hidden" id="reset-btn">
+                    <span>[ INIT NEW SCAN ]</span>
+                </button>
+            </div>
         </main>
     </div>
     

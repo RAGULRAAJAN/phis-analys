@@ -2,7 +2,7 @@ def calculate_risk_score(parsed_data, vt_results):
     score = 0
     max_score = 100
     findings = []
-    
+
     headers = parsed_data.get('headers', {})
     
     # 1. Header Anomalies
@@ -84,6 +84,53 @@ def calculate_risk_score(parsed_data, vt_results):
         if any(att.lower().endswith(ext) for ext in dangerous_extensions):
             score += 40
             findings.append(f"[ HIGH   ] Dangerous attachment detected: {att}")
+
+    # 6. Homograph / Typosquatting
+    typo_findings = parsed_data.get('typo_findings', [])
+    for finding in typo_findings:
+        if "[ HIGH" in finding:
+            score += 20
+        elif "[ MEDIUM" in finding:
+            score += 10
+        findings.append(finding)
+
+    # 7. Social Engineering Lexicon
+    social_score = parsed_data.get('social_score', 0)
+    social_findings = parsed_data.get('social_findings', [])
+    if social_score > 0:
+        score += social_score
+        findings.extend(social_findings)
+
+    # 5. Display Name Spoofing
+    spoof_findings = parsed_data.get('spoof_findings', [])
+    for finding in spoof_findings:
+        if "[ HIGH" in finding:
+            score += 20
+        elif "[ MEDIUM" in finding:
+            score += 10
+        findings.append(finding)
+
+    # 8. Relay Chain Anomalies
+    relay_findings = parsed_data.get('relay_findings', [])
+    for finding in relay_findings:
+        if "[ HIGH" in finding:
+            score += 20
+        elif "[ MEDIUM" in finding:
+            score += 10
+        elif "[ LOW" in finding:
+            score += 10
+        findings.append(finding)
+
+    # 9. Attachment Content Deep Scan
+    attach_findings = parsed_data.get('attach_findings', [])
+    for finding in attach_findings:
+        if "[ HIGH" in finding:
+            score += 40
+        elif "[ MEDIUM" in finding:
+            score += 15
+        elif "[ LOW" in finding:
+            score += 5
+        findings.append(finding)
         
     final_score = min(score, max_score)
     

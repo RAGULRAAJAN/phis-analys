@@ -338,3 +338,76 @@ body {
     font-weight: 600;
 }
 .cyber-btn:hover { background: var(--accent-glow); box-shadow: 0 0 20px var(--accent-glow); color: #fff; }
+
+/* Print / PDF Export Styles */
+@media print {
+    body, html {
+        background: white !important;
+        color: black !important;
+        overflow: visible !important;
+        height: auto !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    body {
+        overflow-x: visible !important;
+    }
+    .cyber-grid-overlay,
+    #upload-view,
+    .top-nav,
+    .action-buttons {
+        display: none !important;
+    }
+    .container, #results, .bento-grid {
+        display: block !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        height: auto !important;
+        position: static !important;
+    }
+    .bento-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+    .bento-card {
+        background: white !important;
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+        color: black !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin: 0 0 15px 0 !important;
+        width: 100% !important;
+        position: static !important;
+        overflow: visible !important;
+    }
+    .body-card {
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+    }
+    .section-title {
+        color: #d32f2f !important;
+        border-bottom: 1px solid #eee !important;
+        padding-bottom: 5px !important;
+    }
+    .score-text,
+    .score-circle {
+        filter: none !important;
+        text-shadow: none !important;
+    }
+    .score-text { color: black !important; }
+    .neon-text { text-shadow: none !important; color: black !important; }
+    .tech-list { color: black !important; }
+    .tech-list strong { color: #555 !important; }
+    #url-count { color: #000 !important; }
+    .badge-critical { color: white !important; border: 1px solid #d32f2f !important; background: #d32f2f !important; }
+    .badge-high { color: white !important; background: #f57c00 !important; }
+    .badge-medium { color: white !important; background: #fbc02d !important; }
+    .badge-low { color: white !important; background: #388e3c !important; }
+    .body-preview-box { background: transparent !important; color: #111 !important; border: 1px solid #ccc !important; overflow: visible !important; max-height: none !important; white-space: pre-wrap !important; word-wrap: break-word !important; padding: 10px !important; box-shadow: none !important; }
+    table th, table td { color: black !important; border-bottom: 1px solid #ddd !important; }
+}
